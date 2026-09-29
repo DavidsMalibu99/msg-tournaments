@@ -169,6 +169,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
   <div class="card">
     <h2>🏌️ Choose a Tournament</h2>
     <div id="events-list"><div class="empty-state">Loading…</div></div>
+    <div id="admin-entry"></div>
   </div>
   <div class="card" id="create-event-card" style="display:none">
     <h2>➕ New Tournament</h2>
@@ -475,7 +476,7 @@ async function showEventPicker(){
     const evs = snap.docs.map(d => ({id:d.id, ...d.data()}));
     if(evs.length === 1 && !IS_ADMIN){ openEvent(evs[0].id); return; }
     list.innerHTML = evs.length === 0
-      ? `<div class="empty-state">No tournaments yet.${IS_ADMIN ? '' : '<br>Admins: tap 🔒 to sign in and create one.'}</div>`
+      ? `<div class="empty-state">No tournaments yet.${IS_ADMIN ? '' : '<br>Admins: sign in below to create one.'}</div>`
       : evs.map(e => `<div class="course-row" style="cursor:pointer" onclick="openEvent('${esc(e.id)}')">
           <div class="num">${e.started ? '●' : '⛳'}</div>
           <div style="flex:1"><div class="nm">${esc(e.name)}</div><div class="small-muted" style="margin:0">${e.date ? new Date(e.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Date TBD'} · ${esc(e.courseName||'')}</div></div>
@@ -485,15 +486,12 @@ async function showEventPicker(){
   showAdminFab();
 }
 function showAdminFab(){
-  // on the picker the nav is hidden for players; keep a way to reach admin sign-in
-  let fab = document.getElementById('admin-fab');
-  if(!fab){
-    fab = document.createElement('button'); fab.id = 'admin-fab'; fab.className = 'btn btn-ghost';
-    fab.style.cssText = 'position:fixed;left:12px;bottom:12px;margin:0;padding:8px 12px;z-index:6';
-    fab.onclick = adminButton; document.body.appendChild(fab);
-  }
-  fab.textContent = IS_ADMIN ? '🔓 Sign out' : '🔒 Admin';
-  fab.style.display = EVENT ? 'none' : '';
+  // on the tournament list the tab bar is hidden for players, so admin sign-in lives in the card
+  const el = document.getElementById('admin-entry');
+  if(!el) return;
+  el.innerHTML = IS_ADMIN
+    ? `<p class="small-muted" style="text-align:center;margin-top:12px">Signed in as ${esc(USER && USER.email || 'admin')}</p><button class="btn btn-ghost btn-block" onclick="adminButton()">🔓 Sign Out</button>`
+    : `<button class="btn btn-secondary btn-block" onclick="adminButton()">🔒 Admin Sign-In</button>`;
 }
 
 async function loadCourseOptions(){
