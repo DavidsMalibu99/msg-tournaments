@@ -7,7 +7,7 @@
 <title>Money Shots Golf Tournaments</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Rye&display=swap" rel="stylesheet">
 <style>
 :root{
   color-scheme: light;
@@ -142,8 +142,17 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .modal{position:fixed;inset:0;background:rgba(10,40,60,.7);display:none;align-items:center;justify-content:center;z-index:40;padding:16px}
 .modal.show{display:flex}
 @media print{ .sync-pill,#admin-fab{display:none !important} }
-header.banner-header{background:#fff;padding:0;display:block;box-shadow:0 2px 10px rgba(0,0,0,.25)}
-.banner-img{display:block;width:100%;max-width:720px;height:auto;margin:0 auto}
+header.hdr{background:#fff;color:var(--mv-ink);display:flex;flex-direction:row;align-items:center;justify-content:center;gap:40px;padding:8px 14px 9px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.hdr-main{display:flex;flex-direction:column;align-items:center;min-width:0}
+.hdr-logo{height:58px;width:auto;flex:none;display:block;margin-bottom:3px}
+.hdr-text{min-width:0;max-width:560px}
+header.hdr h1{font-family:'Rye',Georgia,serif;font-weight:400;color:#1d7a3c;font-size:clamp(17px,4.8vw,24px);line-height:1.15;margin:0;text-shadow:none;letter-spacing:.01em}
+.hdr-tag{font-family:'Playfair Display',Georgia,serif;color:#b3202a;font-size:clamp(12.5px,3.4vw,16px);line-height:1.2;margin-top:2px}
+.hdr-benefit{font-size:clamp(9px,2.5vw,11.5px);font-weight:800;color:#1c2b2b;letter-spacing:.05em;text-transform:uppercase;margin-top:3px;line-height:1.3}
+.hdr-sub{font-size:clamp(10px,2.6vw,12px);color:#6b6355;margin-top:1px}
+.hdr-sub:empty{display:none}
+.hdr-heart{display:none;height:72px;width:auto;flex:none}
+@media (min-width:980px){ .hdr-heart{display:block} }
 /* layout with sponsor rails */
 .layout{display:block}
 .rail{display:none}
@@ -162,15 +171,32 @@ header.banner-header{background:#fff;padding:0;display:block;box-shadow:0 2px 10
   .sponsor-footer{display:none}
 }
 @media print{ .rail,.sponsor-footer{display:none !important} }
+/* compact header on phones */
+@media (max-width:480px){
+  header.hdr{padding:7px 10px 8px}
+  .hdr-logo{height:56px}
+  .hdr-sub .opt{display:none}
+}
+/* page background: tournament green */
+:root{--mv-sand:#1d7a3c}
+.rail-label{color:#e3f4e8}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
 
-<header class="banner-header">
-  <img class="banner-img" src="banner.jpg" alt="Money Shots Golf Events presents Not Your Ordinary Tournament — (Par 3) Chance at a Million Dollar Shoot Out! Benefiting God's Garage. All skill levels are welcome.">
-  <h1 id="event-title" class="sr-only">Money Shots Golf Tournaments</h1>
-  <div id="event-sub" class="sr-only"></div>
+<header class="hdr">
+  <img class="hdr-heart" src="hdr-heart-l.png" alt="">
+  <div class="hdr-main">
+    <img class="hdr-logo" src="hdr-logo.png" alt="Money Shots Golf Events">
+    <div class="hdr-text">
+      <h1 id="event-title">Money Shots Golf Tournaments</h1>
+      <div class="hdr-tag">(Par 3) Chance at a Million Dollar Shoot Out!</div>
+      <div class="hdr-benefit">Benefiting God&#39;s Garage &middot; All Skill Levels Welcome</div>
+      <div class="hdr-sub" id="event-sub"></div>
+    </div>
+  </div>
+  <img class="hdr-heart" src="hdr-heart-r.png" alt="">
 </header>
 
 <nav id="main-nav">
@@ -677,7 +703,7 @@ function renderHeader(){
   document.getElementById('event-title').textContent = EVENT.name || 'Money Shots Golf Tournament';
   let d = '';
   if(EVENT.date) d = new Date(EVENT.date + 'T12:00:00').toLocaleDateString('en-US', {weekday:'short', month:'short', day:'numeric'}) + ' · ';
-  document.getElementById('event-sub').textContent = d + `2-Man Scramble · ${esc(EVENT.courseName || 'Margaritaville Lake Resort')}` + (EVENT.benefit ? ` · Benefiting ${EVENT.benefit}` : '');
+  document.getElementById('event-sub').innerHTML = esc(d) + '2-Man Scramble<span class="opt"> · Margaritaville Lake Resort</span>';
 }
 
 // ---------- foursomes ----------
