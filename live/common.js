@@ -22,8 +22,17 @@ export function mergeTeams(docs){
     const base = byId.get(d.id) || { id: d.id, hole: d.group, team: d.team || 1, players: d.players || [] };
     byId.set(d.id, {...base, ...d, hole: d.group || base.hole});
   });
+  // Day-of change: Mark Williams (h7 T1) and Mike Beck (h8 T2) no-showed, so Gary Cruz + Jake Kelly play as one team.
+  // Show it under whichever slot already has a posted score (hole 7 if neither/both); hide the other slot.
+  const posted = id => { const t = byId.get(id); return !!(t && t.posted && Number.isFinite(t.total)); };
+  for(const m of MERGES){
+    const [a, b] = m.slots, keep = (!posted(a) && posted(b)) ? b : a, drop = keep === a ? b : a;
+    if(byId.has(keep)) byId.get(keep).players = m.players.slice();
+    if(byId.has(drop) && !posted(drop)) byId.delete(drop);
+  }
   return [...byId.values()].filter(t => !t.deleted);
 }
+export const MERGES = [ { slots: ['nyot-h07-t1', 'nyot-h08-t2'], players: ['Gary Cruz', 'Jake Kelly'] } ];
 const KEYS = ['total', 'b9', 'b6', 'b3', 'h18'];
 // Lower is better. Missing tie-break numbers can't separate teams.
 export function cmp(a, b){
