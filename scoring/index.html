@@ -55,6 +55,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <form id="lf"><label for="em">Email</label><input type="email" id="em" autocomplete="username" required>
     <label for="pw" style="margin-top:10px">Password</label><input type="password" id="pw" autocomplete="current-password" required>
     <button style="margin-top:14px;width:100%">Sign in</button></form>
+    <button type="button" class="ghost" id="forgot" style="margin-top:10px;width:100%">Forgot password? Email me a reset link</button>
   </section>
   <div id="app" hidden>
     <div class="tabs"><button id="tab-cards" class="on" type="button">Scorecards</button><button id="tab-ctp" type="button">Closest to Pin</button><button id="tab-add" type="button">Add team</button></div>
@@ -80,7 +81,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <div class="msg" id="msg" role="status"></div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { FB_CONFIG, EVENT_ID, HOLES, PAR, label, toPar, fmtDist, mergeTeams, standings } from '../live/common.js';
 
@@ -97,6 +98,8 @@ const num = v => v === '' || v == null ? null : parseInt(v, 10);
 
 $('lf').addEventListener('submit', e => { e.preventDefault(); signInWithEmailAndPassword(auth, $('em').value.trim(), $('pw').value).catch(err => toast('Sign-in failed: check the email and password.', true)); });
 $('out').onclick = () => signOut(auth);
+$('forgot').onclick = () => { const em = $('em').value.trim(); if(!em){ toast('Type your email above first.', true); return; }
+  sendPasswordResetEmail(auth, em).then(() => toast('Reset link sent to ' + em + '. Check your inbox and spam.')).catch(e => toast('Could not send: ' + (e.code || e.message), true)); };
 onAuthStateChanged(auth, u => {
   const ok = u && !u.isAnonymous;
   $('login').hidden = ok; $('app').hidden = !ok; $('out').hidden = !ok;
