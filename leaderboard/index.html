@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>NYOT Leaderboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Playfair+Display:wght@700;800&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>
+/* TV layout: header band; standings (2 columns) on the left, closest-to-the-pin rail on the right. */
+:root{
+  --felt:#0f4f27; --felt-2:#13612f; --tile:#fbf5e6; --ink:#1c2b2b; --green:#1d7a3c; --teal:#0d7377; --red:#b3202a; --gold:#e8c35a; --muted:#6b776f; --line:#e3dcc8;
+  --display:'Rye',Georgia,serif; --names:'Playfair Display',Georgia,serif; --ui:'Barlow Semi Condensed','Arial Narrow',Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(ellipse at 50% 0%,var(--felt-2),var(--felt) 70%);color:var(--tile);font-family:var(--ui);overflow:hidden}
+.wrap{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:1.4vh;padding:1.6vh max(16px,1.6vw)}
+header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:2vw}
+.logo{height:7.6vh;width:auto}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(26px,3vw,84px);line-height:1;margin:0;text-align:center}
+.sub{text-align:center;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);font-size:clamp(13px,1.2vw,32px);margin-top:.6vh}
+.side{text-align:right;font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:clamp(12px,1vw,26px)}
+.clock{font-size:clamp(22px,2.2vw,60px);font-variant-numeric:tabular-nums;letter-spacing:0}
+.live{display:inline-flex;align-items:center;gap:.4vw;color:var(--gold)}
+.dot{width:.8vw;height:.8vw;min-width:9px;min-height:9px;border-radius:50%;background:#7bd88f;box-shadow:0 0 0 .3vw rgba(123,216,143,.25)}
+.dot.off{background:#e07a5f;box-shadow:none}
+main{display:grid;grid-template-columns:minmax(0,2.35fr) minmax(0,1fr);gap:1.4vw;min-height:0}
+.panel{background:var(--tile);color:var(--ink);border-radius:1.2vh;display:grid;grid-template-rows:auto minmax(0,1fr);overflow:hidden;box-shadow:0 .4vh 1vh rgba(0,0,0,.25)}
+.ph{background:var(--green);color:var(--tile);display:flex;align-items:baseline;justify-content:space-between;padding:.9vh 1vw}
+.ph h2{font-family:var(--display);font-weight:400;font-size:clamp(18px,1.8vw,48px);margin:0}
+.ph span{font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:clamp(11px,.95vw,26px);opacity:.9}
+ol.st{list-style:none;margin:0;padding:.6vh .8vw;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;column-gap:1.4vw;min-height:0}
+.row{display:grid;grid-template-columns:3.4vw minmax(0,1fr) auto 4.6vw;align-items:center;gap:.8vw;border-bottom:1px solid var(--line);min-height:0;padding:0 .2vw}
+.rk{font-family:var(--display);font-size:clamp(15px,1.6vw,44px);color:var(--green);text-align:center}
+.row.p1 .rk{color:var(--red)}
+.who{min-width:0}
+.nm{font-family:var(--names);font-weight:700;font-size:clamp(13px,1.3vw,36px);white-space:nowrap;overflow:hidden;line-height:1.1}
+.meta{font-size:clamp(10px,.78vw,21px);font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.tot{font-family:var(--names);font-weight:800;font-size:clamp(15px,1.6vw,44px);font-variant-numeric:tabular-nums}
+.par{justify-self:end;font-weight:700;font-size:clamp(12px,1.15vw,31px);font-variant-numeric:tabular-nums;border-radius:.6vh;padding:.2vh .5vw;min-width:3.6vw;text-align:center;background:#e9efe9;color:var(--ink)}
+.par.under{background:var(--red);color:#fff}
+.par.even{background:var(--green);color:#fff}
+.row.oc .nm{color:var(--muted);font-weight:700}
+.row.oc .rk{color:#b9c2bb;font-size:clamp(12px,1.1vw,30px)}
+.row.oc .tot{color:#b9c2bb}
+.row.flash{animation:flash 2.4s ease-out}
+@keyframes flash{0%{background:#ffe9a6}100%{background:transparent}}
+ol.ctp{list-style:none;margin:0;padding:.4vh .8vw;display:grid;grid-template-rows:repeat(18,minmax(0,1fr));min-height:0}
+.c{display:grid;grid-template-columns:2.4vw minmax(0,1fr) auto;align-items:center;gap:.6vw;border-bottom:1px solid var(--line);min-height:0}
+.c b{font-family:var(--display);font-weight:400;color:var(--green);font-size:clamp(13px,1.15vw,32px);text-align:center}
+.c .cn{font-weight:700;font-size:clamp(12px,1vw,28px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c .cn small{display:block;font-weight:600;font-size:.72em;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.c .cd{font-family:var(--names);font-weight:800;font-size:clamp(13px,1.1vw,30px);font-variant-numeric:tabular-nums}
+.c.none .cn{color:#b9c2bb;font-style:italic;font-weight:600}
+.fs{position:fixed;right:1vw;bottom:1vh;font:600 13px var(--ui);background:rgba(0,0,0,.45);color:var(--tile);border:1px solid rgba(255,255,255,.3);border-radius:6px;padding:6px 10px;cursor:pointer;transition:opacity .4s}
+.fs.gone{opacity:0;pointer-events:none}
+.err{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:var(--tile);color:var(--ink);padding:20px 24px;border-radius:10px;font-size:18px;max-width:80vw;text-align:center}
+@media (max-width:900px),(max-aspect-ratio:4/3){
+  body{overflow:auto} .wrap{height:auto} header{grid-template-columns:1fr;text-align:center} .logo{margin:auto;height:60px} .side{text-align:center}
+  main{grid-template-columns:1fr} ol.st{grid-template-columns:1fr;grid-auto-flow:row} .row{grid-template-columns:40px minmax(0,1fr) auto 56px;padding:6px 0}
+  ol.ctp{grid-template-rows:none} .c{grid-template-columns:32px minmax(0,1fr) auto;padding:5px 0} .nm{white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){.row.flash{animation:none}}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <img class="logo" src="../hdr-logo.png" alt="Money Shots Golf Events">
+    <div><h1>Not Your Ordinary Tournament</h1><div class="sub">Live Leaderboard · 2-Person Scramble · Par 54</div></div>
+    <div class="side"><div class="clock" id="clock">—</div><span class="live"><span class="dot off" id="dot"></span><span id="livetxt">Connecting</span></span></div>
+  </header>
+  <main>
+    <section class="panel"><div class="ph"><h2>Standings</h2><span id="count"></span></div><ol class="st" id="st"></ol></section>
+    <section class="panel"><div class="ph"><h2>Closest to the Pin</h2><span>All 18 holes</span></div><ol class="ctp" id="ctp"></ol></section>
+  </main>
+</div>
+<button class="fs" id="fs" type="button">Full screen</button>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { FB_CONFIG, EVENT_ID, HOLES, TEAMS, PAR, label, toPar, fmtDist, mergeTeams, standings } from '../live/common.js';
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let teamDocs = [], ctp = {}, lastTotals = new Map(), first = true;
+
+function render(){
+  const all = mergeTeams(teamDocs);
+  const { done, out } = standings(all);
+  const rows = [...done, ...out];
+  $('st').style.gridTemplateRows = `repeat(${Math.max(1, Math.ceil(rows.length / 2))}, minmax(0,1fr))`;
+  $('count').textContent = `${done.length} of ${all.length} cards in`;
+  $('st').innerHTML = rows.map(t => {
+    const posted = done.includes(t), d = posted ? t.total - PAR : 0;
+    const changed = !first && posted && lastTotals.get(t.id) !== t.total;
+    return `<li class="row ${posted ? '' : 'oc'} ${posted && t.rank === 1 ? 'p1' : ''} ${changed ? 'flash' : ''}">
+      <div class="rk">${posted ? (t.tied ? 'T' : '') + t.rank : '·'}</div>
+      <div class="who"><div class="nm">${esc(label(t))}</div><div class="meta">Started hole ${t.hole}${posted ? '' : ' · on the course'}</div></div>
+      <div class="tot">${posted ? t.total : '—'}</div>
+      <div class="par ${posted ? (d < 0 ? 'under' : d === 0 ? 'even' : '') : ''}">${posted ? toPar(t.total) : ''}</div></li>`;
+  }).join('');
+  lastTotals = new Map(done.map(t => [t.id, t.total])); first = false;
+  fit();
+  $('ctp').innerHTML = HOLES.map(h => {
+    const c = ctp[h.n];
+    return c && c.winner
+      ? `<li class="c"><b>${h.n}</b><div class="cn">${esc(c.winner)}<small>${esc(h.name)}</small></div><div class="cd">${fmtDist(c.inches)}</div></li>`
+      : `<li class="c none"><b>${h.n}</b><div class="cn">${esc(h.name)}</div><div class="cd"></div></li>`;
+  }).join('');
+}
+function fit(){
+  if(matchMedia('(max-width:900px),(max-aspect-ratio:4/3)').matches) return;
+  document.querySelectorAll('.nm').forEach(n => {
+    n.style.fontSize = ''; let px = parseFloat(getComputedStyle(n).fontSize); const min = px * .7;
+    while(n.scrollWidth > n.clientWidth + 1 && px > min){ px -= .5; n.style.fontSize = px + 'px'; }
+  });
+}
+function status(ok, txt){ $('dot').classList.toggle('off', !ok); $('livetxt').textContent = txt; }
+
+render();
+try{
+  const app = initializeApp(FB_CONFIG), auth = getAuth(app), db = getFirestore(app);
+  onAuthStateChanged(auth, u => {
+    if(!u){ signInAnonymously(auth).catch(e => status(false, 'Offline')); return; }
+    onSnapshot(collection(db, 'events', EVENT_ID, 'teams'), s => {
+      teamDocs = s.docs.map(d => ({ id: d.id, ...d.data() })).filter(d => d.id.startsWith('nyot-'));
+      status(true, 'Live'); render();
+    }, e => status(false, 'Not connected'));
+    onSnapshot(collection(db, 'events', EVENT_ID, 'ctp'), s => {
+      ctp = {}; s.docs.forEach(d => ctp[d.id] = d.data()); render();
+    }, e => {});
+  });
+}catch(e){ status(false, 'Offline'); }
+
+const tick = () => { const d = new Date(), h = d.getHours(), m = d.getMinutes(); $('clock').textContent = ((h % 12) || 12) + ':' + (m < 10 ? '0' : '') + m + (h < 12 ? ' AM' : ' PM'); };
+tick(); setInterval(tick, 10000);
+addEventListener('resize', fit);
+if(document.fonts) document.fonts.ready.then(fit);
+const b = $('fs'); let t; const hide = () => { clearTimeout(t); b.classList.remove('gone'); t = setTimeout(() => b.classList.add('gone'), 5000); };
+addEventListener('pointerdown', hide); hide();
+const wake = async () => { try{ if(navigator.wakeLock) await navigator.wakeLock.request('screen'); }catch(e){} };
+b.addEventListener('click', async () => { const el = document.documentElement; try{ if(el.requestFullscreen) await el.requestFullscreen(); else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen(); }catch(e){} wake(); });
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') wake(); });
+wake();
+</script>
+</body></html>
