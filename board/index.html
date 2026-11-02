@@ -47,7 +47,7 @@ ul.rail{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:re
 .fs:focus-visible{outline:2px solid var(--gold)}
 .fs.gone{opacity:0;pointer-events:none}
 /* small screens: scroll a single column instead of one fixed screen */
-@media (max-width:900px),(max-aspect-ratio:4/3){
+@media (max-width:700px){
   body{overflow:auto} .board{height:auto}
   header{grid-template-columns:1fr;text-align:center} .logo{height:64px;margin:auto} .side{text-align:center}
   ol.grid{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}
@@ -130,7 +130,7 @@ ul.rail{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:re
   function tick(){var d=new Date(),h=d.getHours(),m=d.getMinutes();c.textContent=((h%12)||12)+':'+(m<10?'0':'')+m+(h<12?' AM':' PM');}
   tick(); setInterval(tick,10000);
   function fit(){
-    if(matchMedia('(max-width:900px),(max-aspect-ratio:4/3)').matches){document.querySelectorAll('.nm').forEach(function(n){n.style.fontSize=''});return;}
+    if(matchMedia('(max-width:700px)').matches){document.querySelectorAll('.nm').forEach(function(n){n.style.fontSize=''});return;}
     document.querySelectorAll('.team:not(.open) .nm').forEach(function(n){
       n.style.fontSize=''; var px=parseFloat(getComputedStyle(n).fontSize), min=px*0.72;
       while(n.scrollWidth>n.clientWidth+1 && px>min){px-=0.5;n.style.fontSize=px+'px';}
